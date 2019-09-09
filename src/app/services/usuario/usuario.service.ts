@@ -5,6 +5,7 @@ import { URL_SERVICIOS } from '../../config/config';
 
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { SubirArchivoService } from '../subir-archivo/subir-archivo.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class UsuarioService {
   token: string;
 
   constructor(public http: HttpClient,
-              public router: Router) {
+              public router: Router,
+              public _subirArchivo: SubirArchivoService) {
    this.cargarStorage();
 
   }
@@ -109,6 +111,43 @@ export class UsuarioService {
                   return resp.usuario;
                 })
               );
+
+  }
+
+
+  actualizarUsuario ( usuario: Usuario ) {
+    let url = URL_SERVICIOS + '/usuario/' + usuario._id;
+    /* concatenar el token ya que en nuestro backend es una ruta que necesita autenticacion */
+    url += '?token=' + this.token;
+    
+
+    return this.http.put(url, usuario )
+          .pipe(
+            map( (resp: any) => {
+                
+              
+
+              this.guardarStorage( resp.usuarioGuardado._id, this.token, resp.usuarioGuardado);
+              console.log('Usuario Actualizado', resp.usuarioGuardado.nombre, 'success'  );  /* swal('Usuario Actualizado', usuario.nombre, 'sucess'); */
+              return true;
+            })
+          );
+
+  }
+  
+  cambiarImagen( archivo: File, id: string) {
+    
+    this._subirArchivo.subirArchivo(archivo, 'usuarios', id)
+          .then ( (resp:any) => {
+            /* aqui asignamos la nueva imagen para el usuario, que luego seria enviada */
+
+            this.usuario.img = resp.usuarioActualizado.img;
+            console.log('Imagen actualizada'); /* swal('Imagen actualizada', this.usuario.nombre,'success'); */
+            this.guardarStorage( id, this.token, this.usuario);
+          })
+          .catch( resp => {
+            console.log(resp);
+          });
 
   }
   
