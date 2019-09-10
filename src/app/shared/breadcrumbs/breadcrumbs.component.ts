@@ -17,7 +17,7 @@ export class BreadcrumbsComponent implements OnInit {
               private meta: Meta) { 
    
    this.getDataRoute().subscribe( data => {
-      console.log(data);
+
       /* asignaos el valor retornado por el observable */
       this.titulo = data.titulo;
       this.title.setTitle(this.titulo);

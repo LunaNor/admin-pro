@@ -6,6 +6,7 @@ import { URL_SERVICIOS } from '../../config/config';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { SubirArchivoService } from '../subir-archivo/subir-archivo.service';
+import { timingSafeEqual } from 'crypto';
 
 @Injectable({
   providedIn: 'root'
@@ -125,9 +126,11 @@ export class UsuarioService {
           .pipe(
             map( (resp: any) => {
                 
-              
+              if (usuario._id === this.usuario._id) {
+                this.guardarStorage( resp.usuarioGuardado._id, this.token, resp.usuarioGuardado);
 
-              this.guardarStorage( resp.usuarioGuardado._id, this.token, resp.usuarioGuardado);
+              }
+
               console.log('Usuario Actualizado', resp.usuarioGuardado.nombre, 'success'  );  /* swal('Usuario Actualizado', usuario.nombre, 'sucess'); */
               return true;
             })
@@ -149,6 +152,41 @@ export class UsuarioService {
             console.log(resp);
           });
 
+  }
+
+
+  cargarUsuarios(desde:number = 0) {
+    let url = URL_SERVICIOS + '/usuario?desde=' + desde;
+  
+    return this.http.get(url);  
+
+  }
+
+  buscarUsuarios( termino: string) {
+ 
+
+    let url = URL_SERVICIOS + '/busqueda/coleccion/usuarios/' + termino;
+    return this.http.get( url )
+            .pipe(
+              map(
+                (resp:any) => resp.usuarios
+              )
+            );
+  }
+
+  borrarUsuario ( id: string) {
+    let url = URL_SERVICIOS + '/usuario/' + id ;
+    url += '?token=' + this.token;
+
+    return this.http.delete( url)
+          .pipe (
+            map (
+              resp => {
+                console.log('Usuario Borrado'); /* swal('Usuario borrado, 'El usuario ha sido eliminado correctamente', 'success') */
+                return true;
+              }
+            )
+          );
   }
   
 
