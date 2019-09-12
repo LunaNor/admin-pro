@@ -6,7 +6,7 @@ import { URL_SERVICIOS } from '../../config/config';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { SubirArchivoService } from '../subir-archivo/subir-archivo.service';
-import { timingSafeEqual } from 'crypto';
+
 
 @Injectable({
   providedIn: 'root'
